@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript" src="/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="/js/materialize.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="css/materialize.min.css" />
+	<title>ToneJS Player</title>
+</head>
+<body>
+
+
+
+<!-- Non-DOM related scripts -->
+<script type="text/javascript" src="js/Tone.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    $(document).ready(function(){
+        $('#note').material_select();
+        $('#duration').material_select();
+        var socket = io(); // Socket is connected.
+        var synth = new Tone.Synth().toMaster(); // Basic Synth is initialized
+
+        socket.on('player', function(message){
+            console.log('message received')
+            synth.triggerAttackRelease(message.note, message.duration)
+        });
+
+    })
+</script>
+</body>
+</html>

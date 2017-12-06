@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript" src="/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="/js/materialize.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css" />
+    <title>ToneJS Controller</title>
+</head>
+<body>
+<br /><br />
+<div class="container">
+    <div class="row">
+        <div class="col s6 l4 m4">
+            <select class="browser-default" id="note">
+                <option value="" disabled selected>Note</option>
+                <option value="A4">A4</option>
+                <option value="C4">C4</option>
+                <option value="D4">D4</option>
+                <option value="G4">D4</option>
+            </select>
+        </div>
+        <div class="col s6 l4 m4">
+            <select class="browser-default" id="duration">
+                <option value="" disabled selected>Duration</option>
+                <option value="8t">8t</option>
+                <option value="1m">1m</option>
+                <option value="2n">2n</option>
+                <option value="16t">16t</option>
+            </select>
+        </div>
+        <div class="s12 l4 m4 center-align">
+            <button id="play" class="waves-effect waves-light btn" onclick="play();">Play</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- Non-DOM related scripts -->
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    var socket;
+    function play(){
+        var note = $('#note').val();
+        var duration = $("#duration").val();
+        if(note!=null && duration != null && note != '' && duration != ''){
+            socket.emit('controller', {note: note, duration: duration});
+        }
+        else{
+            alert('Select note and duration to play')
+        }
+    }
+
+    $(document).ready(function(){
+        socket = io(); // Socket is connected.
+    });
+</script>
+</body>
+</html>
