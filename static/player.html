@@ -101,7 +101,7 @@
             console.log('message received')
             var latency = Math.floor(Date.now()) - parseFloat(message.timestamp)
             latency = (latency/1000).toFixed(3)
-            time.text(latency+"ms");
+            time.text(latency+"s");
             synth.triggerAttackRelease(message.note, message.duration)
 
         });
