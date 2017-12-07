@@ -98,7 +98,6 @@
         var synth = new Tone.AMSynth().fan(fft, waveform).toMaster(); // Basic Synth is initialized
         var time = $("#time");
         socket.on('player', function(message){
-            console.log('message received')
             var latency = Math.floor(Date.now()) - parseFloat(message.timestamp)
             latency = (latency/1000).toFixed(3)
             time.text(latency+"s");
