@@ -20,7 +20,7 @@ io.on('connection', function(socket){
 
   // Setup a note transfer connection between controller and player
     socket.on('controller', function(message){
-        io.emit('player', { note: message.note, duration: message.duration });
+        io.emit('player', { note: message.note, duration: message.duration, timestamp: message.timestamp });
     });
 
 

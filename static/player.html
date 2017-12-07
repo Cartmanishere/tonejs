@@ -5,9 +5,26 @@
     <script type="text/javascript" src="/js/jquery-3.2.1.min.js"></script>
     <script type="text/javascript" src="/js/materialize.min.js"></script>
 	<link type="text/css" rel="stylesheet" href="css/materialize.min.css" />
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
 	<title>ToneJS Player</title>
+    <style type="text/css">
+        .fixed-header{
+            width: 100%;
+            float: top;     
+            background: #222;
+            padding: 10px 0;
+            color: #eee;
+            letter-spacing: 3px;
+            top: 0;
+            height: 50px;
+            font-size: 30px;
+        }
+    </style>
 </head>
 <body>
+<div class="fixed-header">
+    <h6 align="center">Last Request Latency = <span id="time">0 ms</span></h6>
+</div>
 <canvas id="fft"></canvas><br>
 <canvas id="waveform"></canvas>
 
@@ -52,7 +69,7 @@
         // canvasWidth = $("#fft").width();
         // canvasHeight = $("#fft").height();
         canvasWidth = window.innerWidth;
-        canvasHeight = window.innerHeight/2;
+        canvasHeight = (window.innerHeight - 50)/2;
         waveContext.canvas.width = canvasWidth;
         fftContext.canvas.width = canvasWidth;
         waveContext.canvas.height = canvasHeight;
@@ -74,16 +91,19 @@
 
     
     $(document).ready(function(){
-
         //get the waveform data for the audio
         waveform = new Tone.Waveform(1024);
         fft = new Tone.FFT(64);
         var socket = io(); // Socket is connected.
         var synth = new Tone.AMSynth().fan(fft, waveform).toMaster(); // Basic Synth is initialized
-
+        var time = $("#time");
         socket.on('player', function(message){
             console.log('message received')
+            var latency = Math.floor(Date.now()) - parseFloat(message.timestamp)
+            latency = (latency/1000).toFixed(3)
+            time.text(latency+"ms");
             synth.triggerAttackRelease(message.note, message.duration)
+
         });
 
         waveContext = document.getElementById('waveform').getContext("2d");

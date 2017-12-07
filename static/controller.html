@@ -69,7 +69,7 @@
         var note = $('#note').val();
         var duration = $("#duration").val();
         if(note!=null && duration != null && note != '' && duration != ''){
-            socket.emit('controller', {note: note, duration: duration});
+            socket.emit('controller', {note: note, duration: duration, timestamp: Math.floor(Date.now())});
         }
         else{
             alert('Select note and duration to play')
@@ -78,17 +78,13 @@
     function sendnote(note){
         var duration = $("#duration").val();
         if(note!=null && duration != null && note != '' && duration != ''){
-            socket.emit('controller', {note: note, duration: duration});
+            socket.emit('controller', {note: note, duration: duration, timestamp: Math.floor(Date.now())});
         }
         else{
             alert('Select note and duration to play')
         }
     }
 
-    function shakeEventDidOccur () {
-        //put your own code here etc.
-        alert('shake!');
-    }
     if(isMobile){
         var myShakeEvent = new Shake({
             threshold: 4, // optional shake strength threshold
