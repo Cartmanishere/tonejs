@@ -17,7 +17,6 @@ app.get('/controller', function(req, res){
 io.on('connection', function(socket){
     console.log('Connection received!')
   // Received a connection
-  // Check if player or controller
 
   // Setup a note transfer connection between controller and player
     socket.on('controller', function(message){
@@ -33,6 +32,6 @@ io.on('connection', function(socket){
     });
 });
 
-http.listen(process.env.PORT || 3000, function(){
-  console.log('listening on *:'+process.env.PORT || 3000);
+http.listen(3000, function(){
+  console.log('listening on *:3000');
 });

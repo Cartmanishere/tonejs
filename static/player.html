@@ -1,29 +1,96 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
     <script type="text/javascript" src="/js/jquery-3.2.1.min.js"></script>
     <script type="text/javascript" src="/js/materialize.min.js"></script>
 	<link type="text/css" rel="stylesheet" href="css/materialize.min.css" />
 	<title>ToneJS Player</title>
 </head>
 <body>
-
-
+<canvas id="fft"></canvas><br>
+<canvas id="waveform"></canvas>
 
 <!-- Non-DOM related scripts -->
 <script type="text/javascript" src="js/Tone.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
+<script src="/js/draggabilly.js"></script>
+<script src="/js/StartAudioContext.js"></script>
+<script src="/js/Interface.js"></script>
 <script>
+    var waveContext, waveformGradient, waveform, fft, fftContext;
+    function drawWaveform(values){
+        //draw the waveform
+        waveContext.clearRect(0, 0, canvasWidth, canvasHeight);
+        waveContext.beginPath();
+        waveContext.lineJoin = "round";
+        waveContext.lineWidth = 6;
+        waveContext.strokeStyle = waveformGradient;
+        waveContext.moveTo(0, (values[0] / 255) * canvasHeight);
+        for (var i = 1, len = values.length; i < len; i++){
+            var val = (values[i] + 1) / 2;
+            var x = canvasWidth * (i / len);
+            var y = val * canvasHeight;
+            waveContext.lineTo(x, y);
+        }
+        waveContext.stroke();
+    }
+
+    function drawFFT(values){
+        fftContext.clearRect(0, 0, canvasWidth, canvasHeight);
+        var barWidth = canvasWidth / fft.size;
+        for (var i = 0, len = values.length; i < len; i++){
+            var x = canvasWidth * (i / len);
+            var y = (values[i] + 140) * 2;
+            fftContext.fillStyle = "rgba(0, 0, 0, " + i/len + ")";
+            fftContext.fillRect(x, canvasHeight - y, barWidth, canvasHeight);
+        }
+    }
+
+    var canvasWidth, canvasHeight;
+    function sizeCanvases(){
+        // canvasWidth = $("#fft").width();
+        // canvasHeight = $("#fft").height();
+        canvasWidth = window.innerWidth;
+        canvasHeight = window.innerHeight/2;
+        waveContext.canvas.width = canvasWidth;
+        fftContext.canvas.width = canvasWidth;
+        waveContext.canvas.height = canvasHeight;
+        fftContext.canvas.height = canvasHeight;
+        //make the gradient
+        waveformGradient = waveContext.createLinearGradient(0, 0, canvasWidth, canvasHeight);
+        waveformGradient.addColorStop(0, "#ddd");
+        waveformGradient.addColorStop(1, "#000");
+    }
+    function loop(){
+        requestAnimationFrame(loop);
+        //get the fft data and draw it
+        var fftValues = fft.getValue();
+        drawFFT(fftValues);
+        //get the waveform valeus and draw it
+        var waveformValues = waveform.getValue();
+        drawWaveform(waveformValues);
+    }
+
+    
     $(document).ready(function(){
-        $('#note').material_select();
-        $('#duration').material_select();
+
+        //get the waveform data for the audio
+        waveform = new Tone.Waveform(1024);
+        fft = new Tone.FFT(64);
         var socket = io(); // Socket is connected.
-        var synth = new Tone.Synth().toMaster(); // Basic Synth is initialized
+        var synth = new Tone.AMSynth().fan(fft, waveform).toMaster(); // Basic Synth is initialized
 
         socket.on('player', function(message){
             console.log('message received')
             synth.triggerAttackRelease(message.note, message.duration)
         });
+
+        waveContext = document.getElementById('waveform').getContext("2d");
+        fftContext = document.getElementById('fft').getContext("2d");
+        
+        sizeCanvases();
+        loop();
 
     })
 </script>
